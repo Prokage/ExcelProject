@@ -67,12 +67,13 @@ class TraineeManager:
         course_sheet.cell(row=row, column=1, value=course_id)
         course_sheet.cell(row=row, column=2, value=course_description)
     def add_trainee(self, trainee):
-        row = self.sheet.max_row + 1
-        self.sheet.cell(row=row, column=1, value=trainee.trainee_id)
-        self.sheet.cell(row=row, column=2, value=trainee.name)
-        self.sheet.cell(row=row, column=3, value=trainee.course)
-        self.sheet.cell(row=row, column=4, value=trainee.background)
-        self.sheet.cell(row=row, column=5, value=trainee.work_experience)
+        row = self.trainee_sheet.max_row + 1
+        self.trainee_sheet.cell(row=row, column=1, value=trainee.trainee_id)
+        self.trainee_sheet.cell(row=row, column=2, value=trainee.name)
+        self.trainee_sheet.cell(row=row, column=3, value=trainee.course)
+        self.trainee_sheet.cell(row=row, column=4, value=trainee.background)
+        self.trainee_sheet.cell(row=row, column=5, value=trainee.work_experience)
+
 
     def delete_trainee(self, trainee_id):
         for row in self.sheet.iter_rows(min_row=2):
@@ -172,85 +173,88 @@ def main_menu():
         print_menu()
         try:
             choice = int(input("Enter your choice: "))
+            if choice == 1:
+                trainee_id = int(input("Enter Trainee ID: "))
+                name = input("Enter Trainee Name: ")
+                course = input("Enter Course: ")
+                background = input("Enter Background/Degree: ")
+                work_experience = int(input("Enter Work Experience (in years): "))
+                trainee = Trainee(trainee_id, name, course, background, work_experience)
+                manager.add_trainee(trainee)
+            elif choice == 2:
+                trainee_id = int(input("Enter Trainee ID: "))
+                manager.delete_trainee(trainee_id)
+            elif choice == 3:
+                trainee_id = int(input("Enter Trainee ID: "))
+                new_name = input("Enter New Trainee Name: ")
+                new_course = input("Enter New Course: ")
+                new_background = input("Enter New Background/Degree: ")
+                new_work_experience = int(input("Enter New Work Experience (in years): "))
+                updated_trainee = Trainee(trainee_id, new_name, new_course, new_background, new_work_experience)
+                manager.update_trainee(updated_trainee)
+            elif choice == 4:
+                course_id = input("Enter Course ID: ")
+                description = input("Enter Course Description: ")
+                manager.add_course_details(course_id, description)
+            elif choice == 5:
+                trainer_id = int(input("Enter Trainer ID: "))
+                full_name = input("Enter Trainer Full Name: ")
+                email_id = input("Enter Trainer Email ID: ")
+                phone_number = input("Enter Trainer Phone Number: ")
+                trainer = Trainer(trainer_id, full_name, email_id, phone_number)
+                manager.add_trainer_details(trainer)
+            elif choice == 6:
+                course_id = input("Enter Course ID: ")
+                trainer_id = int(input("Enter Trainer ID: "))
+                manager.mapping_course_trainer(course_id, trainer_id)
+            elif choice == 7:
+                manager_id = int(input("Enter Manager ID: "))
+                full_name = input("Enter Manager Full Name: ")
+                email_id = input("Enter Manager Email ID: ")
+                phone_number = input("Enter Manager Phone Number: ")
+                manager_obj = Manager(manager_id, full_name, email_id, phone_number)
+                manager.add_manager_details(manager_obj)
+            elif choice == 8:
+                session_date_input = input("Enter session date (YYYY-MM-DD): ")
+                try:
+                    session_date = datetime.datetime.strptime(session_date_input, "%Y-%m-%d").date()
+                except ValueError:
+                    print("Invalid date format. Please use the format YYYY-MM-DD.")
+                    continue
+                start_time = input("Enter session start time (e.g., 9:00 AM): ")
+                end_time = input("Enter session end time (e.g., 5:00 PM): ")
+                course_id = input("Enter Course ID: ")
+                trainer_name = input("Enter Trainer Name: ")
+                num_trainees = int(input("Enter the number of trainees: "))
+                trainee_attendance = {}
+                for i in range(num_trainees):
+                    while True:
+                        trainee_id = int(input(f"Enter Trainee {i + 1} ID: "))
+                        trainee_name = manager.get_trainee_name(trainee_id)
+                        if trainee_name is None:
+                            print("Invalid Trainee ID. Please enter a valid ID.")
+                        else:
+                            break
+                    while True:
+                        attendance = input(f"Enter Trainee {i + 1} Attendance (P/A): ")
+                        if attendance.upper() not in ["P", "A"]:
+                            print("Invalid attendance value. Please enter 'P' or 'A'.")
+                        else:
+                            break
+                    trainee_attendance[trainee_id] = attendance.upper()
+                
+                session = Session(session_date, start_time, end_time, course_id, trainer_name, trainee_attendance)
+                manager.add_session(session)
         except ValueError:
             print("Invalid input. Please enter a number.")
-            continue
-    while True:
-        print_menu()
-        choice = int(input("Enter your choice: "))
 
-        if choice == 1:
-            trainee_id = int(input("Enter Trainee ID: "))
-            name = input("Enter Trainee Name: ")
-            course = input("Enter Course: ")
-            background = input("Enter Background/Degree: ")
-            work_experience = int(input("Enter Work Experience (in years): "))
-            trainee = Trainee(trainee_id, name, course, background, work_experience)
-            manager.add_trainee(trainee)
-        elif choice == 2:
-            trainee_id = int(input("Enter Trainee ID: "))
-            manager.delete_trainee(trainee_id)
-        elif choice == 3:
-            trainee_id = int(input("Enter Trainee ID: "))
-            new_name = input("Enter New Trainee Name: ")
-            new_course = input("Enter New Course: ")
-            new_background = input("Enter New Background/Degree: ")
-            new_work_experience = int(input("Enter New Work Experience (in years): "))
-            updated_trainee = Trainee(trainee_id, new_name, new_course, new_background, new_work_experience)
-            manager.update_trainee(updated_trainee)
-        elif choice == 4:
-            course_id = input("Enter Course ID: ")
-            description = input("Enter Course Description: ")
-            manager.add_course_details(course_id, description)
-        elif choice == 5:
-            trainer_id = int(input("Enter Trainer ID: "))
-            full_name = input("Enter Trainer Full Name: ")
-            email_id = input("Enter Trainer Email ID: ")
-            phone_number = input("Enter Trainer Phone Number: ")
-            trainer = Trainer(trainer_id, full_name, email_id, phone_number)
-            manager.add_trainer_details(trainer)
-        elif choice == 6:
-            course_id = input("Enter Course ID: ")
-            trainer_id = int(input("Enter Trainer ID: "))
-            manager.mapping_course_trainer(course_id, trainer_id)
-        elif choice == 7:
-            manager_id = int(input("Enter Manager ID: "))
-            full_name = input("Enter Manager Full Name: ")
-            email_id = input("Enter Manager Email ID: ")
-            phone_number = input("Enter Manager Phone Number: ")
-            manager_obj = Manager(manager_id, full_name, email_id, phone_number)
-            manager.add_manager_details(manager_obj)
-        elif choice == 8:
-            session_date_input = input("Enter session date (YYYY-MM-DD): ")
-            try:
-                session_date = datetime.datetime.strptime(session_date_input, "%Y-%m-%d").date()
-            except ValueError:
-                print("Invalid date format. Please use the format YYYY-MM-DD.")
-                continue
-            start_time = input("Enter session start time (e.g., 9:00 AM): ")
-            end_time = input("Enter session end time (e.g., 5:00 PM): ")
-            course_id = input("Enter Course ID: ")
-            trainer_name = input("Enter Trainer Name: ")
-            num_trainees = int(input("Enter the number of trainees: "))
-            trainee_attendance = {}
-            for i in range(num_trainees):
-                trainee_id = int(input(f"Enter Trainee {i + 1} ID: "))
-                attendance = input(f"Enter Trainee {i + 1} Attendance (P/A): ")
-                trainee_attendance[trainee_id] = attendance
-        
-            session = Session(session_date, start_time, end_time, course_id, trainer_name, trainee_attendance)
-            manager.add_session(session)
-            pass
-        elif choice == 9:
+        if choice == 9:
             manager.save()
             print("Data saved. Exiting...")
             break
         elif choice == 0:
             print("Exiting without saving...")
             break
-        else:
-            print("Invalid choice. Please try again.")
-
 
 if __name__ == "__main__":
     main_menu()
